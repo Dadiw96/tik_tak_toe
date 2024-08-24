@@ -1,0 +1,263 @@
+import os
+import random
+class Menu:
+    def __init__(self):
+        self.twoplayer = True
+        self.dificulty = None
+        
+    def mainMenu(self):
+        #r=board_size()
+        #self.tryb()
+        self.twoplayer = False
+        if not self.twoplayer: 
+            self.set_dificulty()      
+        
+    def board_size(self):
+        pass
+        
+    def tryb(self):
+        i = int(input(" 1 single \n 2 multi"))
+        if i == 2:
+            self.twoplayer = True
+        elif i == 1: self.twoplayer = False 
+             
+    def set_dificulty(self):
+        #i = int(input("Poziom Trudnosci "))
+        i=0
+        self.dificulty = i       
+class Game(Menu):
+    def __init__(self):
+        super().__init__()
+        self.board = Board()
+        self.playerone = None
+        self.playertwo = None
+                    
+    def start_multi(self):
+        self.playerone = Player(self.board)
+        self.playerone.set_sign()
+        s = "x" if self.playerone.get_sign() == "o" else "o"
+        self.playertwo = Player(self.board,s)
+            
+    def start_single(self):
+        self.playerone = Player(self.board)
+        self.playerone.set_sign()
+        s = "x" if self.playerone.get_sign() == "o" else "o"
+        self.playertwo = Player(self.board,s,human=False)
+            
+            
+            
+    def start(self):
+        self.mainMenu()
+        if self.twoplayer:
+            self.start_multi()
+        else:
+            self.start_single()
+            d = self.dificulty
+            if d == 0:bot = Bot_beg(self.playertwo.get_sign(),self.board)
+        #elif:
+                    
+        self.playertwo.bot = bot
+        self.end(self.middle())   
+                   
+                   
+                   
+    def middle(self):
+        move = 0
+        while True:
+            if  move == 9 or self.playerone.move():
+                return self.playerone.get_sign()
+            move+=1    
+            if move == 9 or self.playertwo.move():
+                return self.playertwo.get_sign()
+            move+=1
+            if move == 9:
+                self.end(None)
+    def end(self,winner):
+        if winner == None:
+            print("Remis")
+        else:
+            print("Wygral: ",winner)
+class Player:
+    def __init__(self,board,sign = None, human = True, bot = None):
+        self.sign = sign 
+        self.is_human = human
+        self.board = board
+        self.bot = bot
+        
+    def set_sign(self):
+         self.sign = input("o lub x ")
+    def get_sign(self):
+        return self.sign
+    def get_is_human(self):
+        return self.is_human
+        
+    def inp(self):
+        
+        while True:
+            w=input(f"Podaj pozycje dla {self.sign} ")
+            if  not w.isdigit():
+                print("Wrong input pls type (0-8)")
+            elif(int(w) not in range (9)):
+                print("Wrong input pls type (0-8)")
+            else:    
+                return int(w)
+    def move(self):
+        s = self.sign
+        if self.is_human: 
+            i = self.inp()  
+        else: 
+            i = self.bot.move()
+        if self.board.allowed(i):
+            self.board.set_arr(i,s)
+            self.board.b(i,s)
+            if self.board.update(i,s):
+                  return True             
+        else:
+            print("Pole zajete\n")
+            self.move()
+        return False
+class Board:
+    def __init__(self,r=3):
+        self.h = "_"
+        self.v = "|"
+        self.r = r
+        self.arr=[" " for _ in range(r*r)] 
+        self.scores = { "row":[0,0,0], "col":[0,0,0], "diag":[0,0]} 
+        
+    def b(self, i=None, s=None):
+        v=self.v
+        arr=self.arr
+        top= [f"{arr[0]} {v} {arr[1]} {v} {arr[2]}"]
+        mid= [f"{arr[3]} {v} {arr[4]} {v} {arr[5]}"]
+        bot= [f"{arr[6]} {v} {arr[7]} {v} {arr[8]}"]
+        line=(self.h*13)
+        b=(top,line,mid,line,bot)
+        self.draw(b)
+        
+    def draw(self,b):
+        self.clear()
+        for line in b:
+            print(line)
+        print(" ")
+ 
+    def set_arr(self,i,s):
+        self.arr[i] = s
+        
+    def allowed(self,i):
+           return self.arr[i] == " "
+    
+    def update(self,i,s):
+        val = 1 if s=="o" else -1
+        row = i //  3#wiersze
+        col = i %  3 #kolumny 
+        self.scores ["row"][row] +=  val
+        self.scores ["col"][col] +=  val
+       
+        if i in [0, 4, 8]:
+            self.scores["diag"][0] += val
+        if i in [2, 4, 6]:
+            self.scores["diag"][1] += val
+    
+    # Sprawdzenie, czy którakolwiek z wartości osiągnęła 3 lub -3
+        if 3 in self.scores["row"] or 3 in self.scores["col"] or 3 in self.scores["diag"]:
+            return True
+        if -3 in self.scores["row"] or -3 in self.scores["col"] or -3 in self.scores["diag"]:
+            return True
+        return False
+    
+    def downgrade(self,i,s):
+       val = -1 if s=="o" else 1
+       row = i //  3#wiersze
+       col = i %  3 #kolumny 
+       self.scores ["row"][row] +=  val
+       self.scores ["col"][col] +=  val
+       
+       if i in [0, 4, 8]:
+           self.scores["diag"][0] += val
+       if i in [2, 4, 6]:
+           self.scores["diag"][1] += val              
+   
+    def clear(self):       
+        if os.name == 'nt':  
+            os.system('cls')#win
+        else: 
+            os.system('clear')
+
+class Node:
+    def __init__(self, value=None, myparent = None):
+        self.value = value
+        self.children = []
+        self.myparent = myparent
+class Tree:
+    def __init__(self,value):
+        self.root = (Node(value))
+    def add_child(self,value,parent = None):
+        if not parent :
+            parent=self.root
+        
+        child_node = Node(value,parent)
+        parent.children.append(child_node)
+        return child_node
+    def dfs_preorder(self,node,result = None) :
+        if result is None:
+            result=[]
+        if node:
+            result.append(node) 
+        for child in node.children:
+            self.dfs_preorder(child, result)
+        return result
+    def r_val(self,node):
+        re = []
+        result = self.dfs_preorder(node)
+        for r in result:
+            re.append(r.value)
+        return re
+    def display(self, node=None, level=0, prefix=""):
+        if node is None:
+            node = self.root
+        
+        # Wydrukuj bieżący węzeł
+        print(prefix + str(node.value))
+
+        # Dodaj linie dla dzieci
+        for i, child in enumerate(node.children):
+            next_prefix = prefix + ("|   " if i < len(node.children) - 1 else "    ")
+            branch = "|-- " if i < len(node.children) - 1 else "`-- "
+            self.display(child, level + 1, prefix + branch)
+class Bot_beg:
+    #bot na beg robi losowy ruch ale spr czy moze wygrac lub przegrac nastepnym ruchem  
+    
+    def __init__(self, s, board):
+        self.s = s
+        self.e = "x" if self.s == "o" else "o"
+        self.board = board
+        self.arr=[i for i in range(board.r * board.r)] #tablica przechowuje wartosci pol ktore zostaja usuniete jesli ruch zostanie wykonany
+   
+    
+    
+    def arr_update(self):
+        for i in self.arr:
+            if not self.board.allowed(i):
+                self.arr.remove(i)
+                
+    def sim_update(self, i, s):
+        anwser = self.board.update(i,s)
+        self.board.downgrade(i,s)
+        return anwser
+ 
+   
+    def move(self):
+       self.arr_update()
+       for i in self.arr:
+           if self.sim_update(i, self.s):
+               return i
+           elif self.sim_update(i,self.e):
+               return i
+       return random.choice(self.arr )
+      
+def main():
+    gra = Game()
+    gra.start()
+    
+if __name__ == "__main__":
+    main()
