@@ -102,7 +102,7 @@ class Player:
         return self.is_human
     
     def move_human(self):
-        s=self.sign
+        s = self.sign
         i = self.inp()  
         if self.board.allowed(i,s):
             self.board.set_arr(i,s)

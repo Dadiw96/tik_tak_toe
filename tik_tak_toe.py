@@ -25,43 +25,6 @@ class Board:
         self.clear()
         for line in b:
             print(line)
-        
-    #def inp(self,s="o"):
-#        while True:
-#            w=input(f"Podaj pozycje dla {s} ")
-#            if  not w.isdigit():
-#                print("Wrong input pls type (0-8)")
-#            elif(int(w) not in range (9)):
-#                print("Wrong input pls type (0-8)")
-#            else:    
-#                return int(w)
-#    def player(self,s):
-#         i = self.inp(s)   
-#         if self.allowed(i,s):
-#             self.arr[i]=s
-#             self.b(i,s)
-#             if self.update(i,s):
-#                   print(s,"is Winner")
-#                   return True
-#             
-#         else:
-#             print("Pole zajete\n")
-#         return False 
-#          
-#            
-#    def o(self,player = True):
-#        s="o"
-#        if player:
-#           return self.player(s)
-#           
-#        
-#           
-#           
-#    def x(self,player = True):
-#        s="x"
-#        if player:
-#            return self.player(s)
-#        else:
             
  #trzeba to przepisac tak by if byl uzyty tylko raz moze stworzyc funkcje menu ktora spr to raz i potem obsluguje sie to zmieniajac poprostu przypisanie do zmiennej w liscie  sa mozliwosci a przypisuje konkretna wartosc do zmiennej i to dziala wywolujac funkcje game z:parametrami
     def set_arr(i,s):
@@ -89,7 +52,8 @@ class Board:
         return False
                   
     def clear(self):
-                  os.system('clear')              
+        #os.system('clear')  
+        os.system('cls')             
                   
     
         
@@ -104,7 +68,7 @@ class Board:
            
 def main():               
     board = Board()
-    board.game()
+    board.b()
     
 if __name__ == "__main__":
     main()

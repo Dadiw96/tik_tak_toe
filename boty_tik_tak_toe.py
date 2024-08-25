@@ -39,7 +39,7 @@ class Bot_beg:
         if i in [2, 4, 6]:
             self.scores["diag"][1] += val
     def move(self):
-       arr_update()
+       self.arr_update()
        for i in self.arr:
            if self.board.sim_update(i, self.s):
                return i
